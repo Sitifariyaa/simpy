@@ -1,0 +1,20 @@
+import simpy
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+
+def simulate(env):
+    while True:
+        # Run your simulation here
+        yield env.timeout(1)
+
+def update(frame, data):
+    data.append(frame)
+    plt.clf()
+    plt.plot(data)
+
+env = simpy.Environment()
+data = []
+env.process(simulate(env))
+
+ani = animation.FuncAnimation(plt.gcf(), update, frames=range(100), fargs=(data,))
+plt.show()
