@@ -1,0 +1,58 @@
+Python 3.10.9 (tags/v3.10.9:1dd9be6, Dec  6 2022, 20:01:21) [MSC v.1934 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import simpy
+>>> import matplotlib.pyplot as plt
+>>>
+>>> def car(env, name, bcs, parking_time):
+...     # Request one of the resources
+...     with bcs.request() as req:
+...         yield req
+...         # The car has successfully parked
+...         parking_start = env.now
+...         print('%s arrived at the parking at %d' % (name, parking_start))
+...         yield env.timeout(parking_time)
+...         # The car has left the parking
+...         parking_end = env.now
+...         print('%s left the parking at %d' % (name, parking_end))
+...         return (parking_start, parking_end)
+...
+>>> # Initialize the environment
+>>> env = simpy.Environment()
+>>> # Initialize the resource
+>>> bcs = simpy.Resource(env, capacity=2)
+>>> # Initialize a list to store the results
+>>> results = []
+>>>
+>>> # Start 4 car processes
+>>> for i in range(4):
+...     results.append(env.process(car(env, 'Car %d' % i, bcs, 5)))
+...
+>>> # Run the simulation
+>>> env.run()
+Car 0 arrived at the parking at 0
+Car 1 arrived at the parking at 0
+Car 0 left the parking at 5
+Car 1 left the parking at 5
+Car 2 arrived at the parking at 5
+Car 3 arrived at the parking at 5
+Car 2 left the parking at 10
+Car 3 left the parking at 10
+>>>
+>>> # Extract the start and end times from the results
+>>> starts = [result.value[0] for result in results]
+>>> ends = [result.value[1] for result in results]
+>>>
+>>> # Plot the results
+>>> plt.plot(starts, [i + 1 for i in range(len(starts))], 'ro', label='Start')
+[<matplotlib.lines.Line2D object at 0x000001D3D608ACE0>]
+>>> plt.plot(ends, [i + 1 for i in range(len(ends))], 'bo', label='End')
+[<matplotlib.lines.Line2D object at 0x000001D3D5397CD0>]
+>>> plt.xlabel('Time')
+Text(0.5, 0, 'Time')
+>>> plt.ylabel('Car')
+Text(0, 0.5, 'Car')
+>>> plt.title('Car Parking Simulation')
+Text(0.5, 1.0, 'Car Parking Simulation')
+>>> plt.legend()
+<matplotlib.legend.Legend object at 0x000001D3D608BFD0>
+>>> plt.show()
