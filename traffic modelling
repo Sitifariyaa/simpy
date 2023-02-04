@@ -1,0 +1,38 @@
+import random
+import simpy
+
+def car(env, name, b_to_c_time):
+    yield env.timeout(random.uniform(5, 6)) # time from a to b
+    print(f'Car {name} arrived at B after {env.now} minutes')
+
+    if random.uniform(0, 1) <= 0.05: # 5% random check
+        print(f'Car {name} was checked and disappeared at {env.now} minutes')
+        return
+    
+    yield env.timeout(b_to_c_time) # time from b to c
+    print(f'Car {name} arrived at C after {env.now} minutes')
+
+def freight(env, name, b_to_c_time):
+    yield env.timeout(random.uniform(7, 8)) # time from a to b
+    print(f'Freight {name} arrived at B after {env.now} minutes')
+
+    if random.uniform(0, 1) <= 0.1: # 10% random check
+        print(f'Freight {name} was checked and disappeared at {env.now} minutes')
+        return
+    
+    yield env.timeout(b_to_c_time) # time from b to c
+    print(f'Freight {name} arrived at C after {env.now} minutes')
+
+def setup_and_run(env, num_cars, num_freights):
+    for i in range(num_cars):
+        env.process(car(env, i, 2))
+    
+    for i in range(num_freights):
+        env.process(freight(env, i, 3))
+    
+    yield env.timeout(0)
+
+random.seed(42)
+env = simpy.Environment()
+env.process(setup_and_run(env, 50, 30))
+env.run(until=100)
