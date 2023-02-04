@@ -1,0 +1,46 @@
+>>> import simpy
+>>>
+>>> def car(env, name, bcs, refuel_time):
+...     # Arrival of the car at the gas station
+...     print('%s arrives at the gas station at %.1f.' % (name, env.now))
+...
+...     # Request one of the resources (gas pumps)
+...     with bcs.request() as req:
+...         yield req
+...
+...         # Car is refueling
+...         print('%s starts refueling at %.1f.' % (name, env.now))
+...         yield env.timeout(refuel_time)
+...
+...         # Car has finished refueling
+...         print('%s leaves the gas station at %.1f.' % (name, env.now))
+...
+>>> # Set up the simulation environment
+>>> env = simpy.Environment()
+>>>
+>>> # Create the resource (gas pumps) with a capacity of 2
+>>> bcs = simpy.Resource(env, capacity=2)
+>>>
+>>> # Start 4 cars arriving at the gas station
+>>> for i in range(4):
+...     env.process(car(env, 'Car %d' % i, bcs, 5))
+...
+<Process(car) object at 0x29e9f85a530>
+<Process(car) object at 0x29ea0adf880>
+<Process(car) object at 0x29ea0adf940>
+<Process(car) object at 0x29ea0adfa60>
+>>> # Run the simulation
+>>> env.run()
+Car 0 arrives at the gas station at 0.0.
+Car 1 arrives at the gas station at 0.0.
+Car 2 arrives at the gas station at 0.0.
+Car 3 arrives at the gas station at 0.0.
+Car 0 starts refueling at 0.0.
+Car 1 starts refueling at 0.0.
+Car 0 leaves the gas station at 5.0.
+Car 1 leaves the gas station at 5.0.
+Car 2 starts refueling at 5.0.
+Car 3 starts refueling at 5.0.
+Car 2 leaves the gas station at 10.0.
+Car 3 leaves the gas station at 10.0.
+>>>
