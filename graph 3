@@ -1,0 +1,48 @@
+import random
+import matplotlib.pyplot as plt
+
+def simulate(num_cars, num_freight):
+    # Initialize the simulation with the number of cars and freights
+    cars = num_cars
+    freights = num_freight
+    time = 8 # starting time at 8.00 AM
+    car_queue = []
+    freight_queue = []
+    total_time = 0
+    
+    # Simulate the journey from road a to road b
+    for i in range(cars):
+        t = random.uniform(1, 2)
+        time += t
+        car_queue.append(time)
+    for i in range(freights):
+        t = random.uniform(2, 3)
+        time += t
+        freight_queue.append(time)
+    
+    # Simulate the journey from road b to road c
+    for i in range(cars):
+        t = random.uniform(3, 4)
+        total_time = max(total_time, time + t)
+        car_queue[i] = total_time
+    for i in range(freights):
+        t = random.uniform(4, 5)
+        total_time = max(total_time, time + t)
+        freight_queue[i] = total_time
+    
+    return total_time, car_queue, freight_queue
+
+def plot_results(car_queue, freight_queue):
+    plt.hist(car_queue, color='blue', alpha=0.5)
+    plt.hist(freight_queue, color='red', alpha=0.5)
+    plt.xlabel("Time (in minutes)")
+    plt.ylabel("Number of vehicles")
+    plt.title("Arrival time at road C")
+    plt.show()
+
+# Run the simulation
+total_time, car_queue, freight_queue = simulate(50, 30)
+print("Total time needed for all vehicles to reach road C: ", total_time, " minutes")
+
+# Plot the results
+plot_results(car_queue, freight_queue)
